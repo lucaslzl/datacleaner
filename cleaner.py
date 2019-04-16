@@ -31,9 +31,15 @@ class DataCleaner:
 
 		data_file = open(file, 'r')
 		data_rows = []
+		first_size = 0
 
 		for line in data_file:
 			line = line.strip().split(self.old_separator)
+
+			if len(line) != first_size:
+				if first_size != 0:
+					continue
+				first_size = len(line)
 
 			item = {}
 			all_ok = True
@@ -45,7 +51,7 @@ class DataCleaner:
 					column_type = data_header['types'][indx]
 					ignore_nan = data_header['ignore_nan'][indx]
 
-					if not ignore_nan and line[position] == '':
+					if not ignore_nan and (line[position].strip() == '' or line[position] == '0'):
 						all_ok = False
 						break
 					item[column] = column_type(line[position])
@@ -74,11 +80,11 @@ if __name__ == '__main__':
 
 	# Data from the city of Chicago
 	# https://data.cityofchicago.org/
-	file = 'data_2018.csv'
-
+	file = 'crimes_2018_chicago.csv'
+	
 	data_header = {'columns': ['Date', 'Type', 'Latitude', 'Longitude'],\
 				'types': [str, str, float, float],\
-				'positions': [1, 4, 14, 15],\
+				'positions': [1, 4, 15, 16],\
 				'ignore_nan': [0, 0, 0, 0]}
 
 	dc = DataCleaner()
